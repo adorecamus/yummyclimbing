@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.party.PartyNoticeMapper">
+
+	<!-- 소모임 공지사항 리스트 -->
+	<select id="selectPartyNoticeList" resultType="com.yummyclimbing.vo.party.PartyNoticeVO">
+		SELECT PI_NUM, PN_NUM, PN_CONTENT, PN_CREDAT, PN_LMODAT, PN_LMOTIM
+		FROM PARTY_NOTICE
+		WHERE PN_ACTIVE =1 AND PI_NUM = #{piNum}
+		ORDER BY PN_NUM ASC
+	</select>
+	
+	<!-- 소모임 공지사항 상세정보 -->
+	<select id="selectPartyNotice" resultType="com.yummyclimbing.vo.party.PartyNoticeVO">
+		SELECT PN_NUM, PN_CONTENT, PN_CREDAT, PN_LMODAT, PN_CRETIM, PN_LMOTIM
+		FROM PARTY_NOTICE
+		WHERE PN_NUM = #{pnNum}
+	</select>
+	
+	<!-- 소모임 공지사항 작성 -->
+	<insert id="insertPartyNotice" parameterType="com.yummyclimbing.vo.party.PartyNoticeVO">
+		INSERT INTO PARTY_NOTICE(
+		PI_NUM, PN_CONTENT
+		)
+		VALUES(
+		#{piNum}, #{pnContent}
+		)
+	</insert>
+	
+	<!-- 소모임 공지사항 수정 -->
+	<update id="updatePartyNotice" parameterType="com.yummyclimbing.vo.party.PartyNoticeVO">
+		UPDATE PARTY_NOTICE
+		SET
+		PN_CONTENT = #{pnContent},
+		PN_LMODAT = DATE_FORMAT(NOW(),'%Y%m%d'),
+		PN_LMOTIM = DATE_FORMAT(NOW(),'%r')
+		WHERE PN_NUM = #{pnNum}
+	</update>
+	
+	<!-- 소모임 공지사항 삭제(비활성화시킴) -->
+	<update id="updatePartyNoticeActive" >
+		UPDATE PARTY_NOTICE
+		SET PN_ACTIVE = 0
+		WHERE PN_NUM = #{pnNum}
+	</update>
+	
+</mapper>

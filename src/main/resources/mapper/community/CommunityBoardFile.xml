@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.community.CommunityBoardFileMapper">
+
+<sql id="cbfColumns">
+	CBF_NUM, CB_NUM, CBF_NAME, CBF_PATH, CBF_UUID
+</sql>
+
+<select id="selectFileList" resultType="com.yummyclimbing.vo.community.CommunityBoardFileVO">
+	SELECT 
+	<include refid="cbfColumns"/>
+	FROM COMMUNITY_BOARD_FILE
+	WHERE CB_NUM = #{cbNum} AND CBF_ACTIVE = 1
+	ORDER BY CBF_NUM
+</select>
+
+<insert id="insertFile">
+	INSERT INTO COMMUNITY_BOARD_FILE(
+	<include refid="cbfColumns"/>
+	)
+	VALUES(
+	#{cbfNum}, #{cbNum}, #{cbfName}, #{cbfPath}, #{cbfUuid}
+	)
+</insert>
+
+<update id="updateFileActiveByCbfNum">
+	UPDATE COMMUNITY_BOARD_FILE
+	SET CBF_ACTIVE = 0
+	WHERE
+	<foreach collection="list" item="cbfNum" separator="OR">
+		CBF_NUM = #{cbfNum}
+	</foreach>
+</update>
+
+<update id="updateFileActiveByCbNum">
+	UPDATE COMMUNITY_BOARD_FILE
+	SET CBF_ACTIVE = 0
+	WHERE CB_NUM = #{cbNum}
+</update>
+
+</mapper>

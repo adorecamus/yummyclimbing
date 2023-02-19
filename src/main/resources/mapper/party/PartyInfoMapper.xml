@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yummyclimbing.mapper.party.PartyInfoMapper">
+
+	<sql id="partyInfoCols">
+		MNTNM, PI_NAME, PI_EXPDAT, PI_MEETING_TIME, 
+		PI_MEMBER_CNT, PI_PROFILE, PI_ICON
+	</sql>
+
+	<!-- 소소모임 리스트, 정렬, 검색 -->
+	<select id="selectPartyInfoList"
+		resultType="com.yummyclimbing.vo.party.PartyInfoVO">
+		SELECT PI_NUM, PI_CREDAT, PI_COMPLETE,
+		<include refid="partyInfoCols"></include>,
+		(SELECT COUNT(PM.UI_NUM)
+		FROM PARTY_MEMBER PM WHERE PM.PI_NUM = PI.PI_NUM AND PM_ACTIVE = 1) MEM_NUM,
+		(SELECT COUNT(PL.UI_NUM)
+		FROM PARTY_LIKE PL WHERE PL.PI_NUM = PI.PI_NUM) LIKE_NUM
+		FROM PARTY_INFO PI
+		WHERE PI_ACTIVE = 1
+		AND PI_COMPLETE IN(0
+		<if test='includeComplete == true'>
+			, 1
+		</if>
+		)
+		<if test='searchType != null and searchType != ""
+			and searchText != null and searchText != ""'>
+			AND ${searchType} LIKE CONCAT('%', #{searchText}, '%')
+		</if>
+		<choose>
+			<when test='sortType != null and sortType != "" and sortOrder != null and sortOrder != ""'>
+				ORDER BY ${sortType} ${sortOrder}
+			</when>
+			<otherwise>
+				ORDER BY LIKE_NUM DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<!-- 추천 소소모임 리스트 -->
+	<select id="selectRecommendedPartyList"
+		resultType="com.yummyclimbing.vo.party.PartyInfoVO">
+		SELECT PI_NUM, PI_CREDAT, PI_COMPLETE,
+		<include refid="partyInfoCols"></include>,
+		(SELECT COUNT(PM.UI_NUM)
+		FROM PARTY_MEMBER PM WHERE PM.PI_NUM = PI.PI_NUM AND PM_ACTIVE = 1) MEM_NUM,
+		(SELECT COUNT(PL.UI_NUM)
+		FROM PARTY_LIKE PL WHERE PL.PI_NUM = PI.PI_NUM) LIKE_NUM
+		FROM PARTY_INFO PI
+		WHERE PI_ACTIVE = 1
+		AND PI_NUM IN(
+		SELECT PI_NUM
+		FROM RANDOM_RECOMMENDATION
+		WHERE RR_CREDAT = DATE_FORMAT(NOW(),'%Y%m%d'))
+		ORDER BY MNTNM ASC
+	</select>
+
+	<!-- 개별 소소모임 보기 -->
+	<select id="selectPartyInfo"
+		resultType="com.yummyclimbing.vo.party.PartyInfoVO">
+		SELECT PI_NUM, PI_CREDAT, PI_COMPLETE,
+		<include refid="partyInfoCols"></include>,
+		(SELECT COUNT(PM.UI_NUM)
+		FROM PARTY_MEMBER PM WHERE PM.PI_NUM = PI.PI_NUM AND PM_ACTIVE = 1) MEM_NUM,
+		(SELECT UI_NICKNAME
+		FROM USER_INFO UI WHERE PI.UI_NUM = UI.UI_NUM AND UI_ACTIVE = 1) UI_NICKNAME
+		FROM PARTY_INFO PI
+		WHERE PI_ACTIVE = 1 AND PI_NUM = #{piNum}
+	</select>
+	
+	<!-- 소소모임 대장 여부 조회 -->
+	<select id="selectCaptainNum"
+		resultType="com.yummyclimbing.vo.party.PartyInfoVO">
+		SELECT UI_NUM
+		FROM PARTY_INFO
+		WHERE UI_NUM = #{uiNum} AND PI_NUM = #{piNum} AND PI_ACTIVE = 1
+	</select>
+
+	<!-- 소소모임 생성 -->
+	<insert id="insertPartyInfo" useGeneratedKeys="true" keyProperty="piNum" keyColumn="PI_NUM">
+		INSERT INTO PARTY_INFO
+		(
+		<include refid="partyInfoCols"></include>
+		, UI_NUM, MI_NUM
+		)
+		VALUES(
+		#{mntnm}, #{piName}, #{piExpdat}, #{piMeetingTime},
+		#{piMemberCnt}, #{piProfile}, #{piIcon},
+		#{uiNum}, #{miNum}
+		)
+	</insert>
+
+	<!-- 소소모임 수정 -->
+	<update id="updatePartyInfo">
+		UPDATE PARTY_INFO
+		SET
+		PI_NAME = #{piName},
+		PI_EXPDAT = #{piExpdat},
+		PI_MEETING_TIME = #{piMeetingTime},
+		PI_MEMBER_CNT = #{piMemberCnt},
+		PI_PROFILE = #{piProfile},
+		PI_LMODAT = DATE_FORMAT(NOW(), '%Y%m%d')
+		WHERE PI_NUM = #{piNum}
+	</update>
+	
+	<!-- 소소모임 삭제(비활성화) -->
+	<update id="updatePartyActive">
+		UPDATE PARTY_INFO
+		SET PI_ACTIVE = 0
+		WHERE PI_NUM = #{piNum}
+	</update>
+	
+	<!-- 소소모임 모집완료 -->
+	<update id="updatePartyComplete">
+		UPDATE PARTY_INFO
+		SET PI_COMPLETE = 1
+		WHERE PI_NUM = #{piNum}
+	</update>
+	
+	<!-- 모집기한 만료 소소모임 개수 -->
+	<select id="selectExpiredParty" resultType="_int">
+		SELECT COUNT(1) FROM PARTY_INFO
+		<![CDATA[
+		WHERE PI_ACTIVE = 1 AND PI_EXPDAT <= #{piExpdat}
+		]]>
+	</select>
+	
+	<!-- 모집기한 만료 소소모임 자동 완료 -->
+	<update id="updatePartyCompleteByExpdat">
+		UPDATE PARTY_INFO
+		SET PI_COMPLETE = 1
+		<![CDATA[
+		WHERE PI_ACTIVE = 1 AND PI_EXPDAT <= #{piExpdat}
+		]]>
+	</update>
+	
+	<!-- 소소모임이 모집기한 만료인지 조회 -->
+	<select id="selectIfPartyExpired" resultType="_int">
+		<![CDATA[
+		SELECT IF(PI_EXPDAT < DATE_FORMAT(NOW(), '%Y-%m-%d'), TRUE, FALSE)
+		FROM PARTY_INFO
+		WHERE PI_NUM = #{piNum}
+		]]>
+	</select>
+	
+	<!-- 정원과 부원 수 비교해서 소소모임 모집완료 상태 변경 -->
+	<update id="updatePartyCompleteByMemberCount">
+		UPDATE PARTY_INFO
+		SET PI_COMPLETE =
+		(SELECT IF(COUNT(PM.UI_NUM) >= PI_MEMBER_CNT, 1, 0)
+		FROM PARTY_INFO PI
+		INNER JOIN PARTY_MEMBER PM ON PI.PI_NUM = PM.PI_NUM
+		WHERE PI_ACTIVE = 1 AND PM_ACTIVE = 1 AND PI.PI_NUM = #{piNum}
+		)
+		WHERE PI_NUM = #{piNum}
+	</update>
+	
+	<!-- 임의 추천 위해 산 넘버로 소소모임 넘버 리스트 셀렉트 -->
+	<select id="selectPiNumListByMiNum" resultType="int">
+		SELECT PI_NUM
+		FROM PARTY_INFO PI
+		INNER JOIN MOUNTAIN_INFO MI ON PI_ACTIVE = 1 AND PI_COMPLETE = 0 AND PI.MNTNM = MI.MNTNM
+		WHERE MI.MI_NUM = #{miNum}
+	</select>
+
+	<!-- 산별 소소모임 리스트 출력 -->
+	<select id="selectPartyInfoListForMntnm" resultType="com.yummyclimbing.vo.party.PartyInfoVO">
+		SELECT
+			PI.PI_NUM, PI.MNTNM, PI.PI_NAME, PI.PI_EXPDAT, PI.PI_MEETING_TIME, 
+			PI.PI_MEMBER_CNT, PI.PI_PROFILE, PI.PI_CREDAT, PI.PI_ICON, COUNT(PM.UI_NUM) MEM_NUM
+		FROM
+			PARTY_INFO PI
+   		INNER JOIN 
+   			PARTY_MEMBER PM 
+   		ON 
+   			PI.PI_ACTIVE=1 AND PM.PM_ACTIVE=1 AND PI.PI_COMPLETE=0 AND PI.PI_NUM = PM.PI_NUM
+		WHERE 
+			MNTNM = #{mntnm}
+		GROUP BY 
+			PI.PI_NUM
+		ORDER BY
+			PI.PI_CREDAT DESC, PI.PI_MEETING_TIME ASC, PI.PI_EXPDAT ASC
+	</select>
+	
+	<!-- 회원계정 탈퇴시 해당 회원이 대장인 소소모임 삭제 -->
+	<delete id="deleteLinkedParty">
+		UPDATE PARTY_INFO
+		SET PI_ACTIVE = 0
+		WHERE UI_NUM = #{uiNum}
+	</delete>
+	
+	
+</mapper>

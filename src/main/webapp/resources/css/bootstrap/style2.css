@@ -1,0 +1,253 @@
+body {
+    background-color: #ddebd7a8;
+    height: 100%;
+    width: 100%;
+}
+.totalWrap {
+    width: 100%;
+    background-color: #ddebd7a8;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    border: 2px solid blue;
+}
+.leftWrap {
+    text-align: center;
+    background-color: white;
+    border-radius: 15px;
+    height: auto;
+    padding-top: 7%;
+    border: 3px solid red;
+}
+
+.partyWidget {
+	border: 3px solid gray;
+}
+.rightWrap {
+    height: 100%;
+    max-height: max-content;
+    border: 3px solid green;
+}
+
+.partyBox, .noticeWrap, .commentWrap {
+    width: 69%;
+    background-color: white;
+    padding: 36px;
+    margin-left: 211px;
+    padding-left: 70px;
+    margin-bottom: 70px;
+    border-radius: 15px;
+    margin-top: 55px;
+    border: 2px solid gray;
+} 
+.partyName {
+	color: green;
+	font-size: 28px;
+	text-align: center;
+}
+
+.partyNameBox {
+	padding: 3%;
+}
+
+.partyNameBox p{
+	font-size : 20px;
+}
+
+.partyIcon_view {
+	width:30%;
+	display: inline-block;
+	margin: auto;
+}
+
+#piMember {
+	cursor: pointer;
+}
+.likeBox {
+	display: inline-block;
+}
+#likeBtn {
+	width: 70px;
+	height: 50px;
+	position: relative;
+	float: left;
+	cursor: pointer;
+	margin: 26px;
+}
+.partyMemberBox {
+	margin-top: 22px;	
+}
+
+.rightWrap h3, .noticeWrap h2 {
+	margin-bottom: 1rem;	
+}
+.img {
+	vertical-align: middle;
+    border: 0;
+    max-width: 100%;
+    height: auto;
+    margin: 10px;
+    z-index: 6;
+    margin-left: -40px;
+    margin-top: -2px;
+}
+.partyInfos {
+	width: 75%;
+    padding: 25px;
+    margin-left: -28px;
+}
+
+.partyInfos p{
+	font-size: 20px;
+	line-height: 2rem;
+	margin-bottom: 0.5rem;
+}
+
+.noticeBox, .commentBox {
+    margin-top: 49px;
+    width: 100%;
+    margin-left: 18px;
+}
+
+.title {
+	background-color: #bbe3c9e0;
+    border-radius: 10px;
+    width: 20%;
+    text-align: center;
+    padding: 2px;
+    box-shadow: 3px 3px 0px 0px #c1c4c1e0;
+}
+.title h3 {
+    color: #646266;
+    font-size: 18px;
+    padding: 4px;
+    margin-top: 18px;
+} 
+
+.textareaNotice {
+    resize: none;
+    max-height: 100px;
+    width: 77%;
+    border: none;
+}
+.textareaComment {
+    resize: none;
+    border: none;
+    margin: -11px;
+    width: 70%;
+ }
+
+.inputCommentBox {
+    padding: 1%;
+    margin-bottom: 3%;
+} 	 	
+.inputNoticeBox {
+    width: 100%;
+    margin-left: 1.5%;
+}
+.noticeList , .commentList{
+    padding-top: 20px;
+    margin-left: 11px;
+    margin-bottom: -20px;
+    width: 92%;
+}
+.inputComment {
+    width: 66%;
+    margin-top: 0px;
+    padding: 16px 16px 16px 16px;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    height: 135px;
+}
+.inputNotice {
+    width: 75%;
+    height: 140px;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    margin: 4% -0.5% 3% 0%;
+}
+
+.fixed {
+	margin-bottom: 0.5rem;
+}
+.paging {
+	clear: both;
+	margin-left: 1%;
+}
+.noticeWrap {
+	margin-top: 30px;
+	margin-bottom: 30px;	
+}
+
+.commentList .fixed, .noticeList .fixed {
+	margin-bottom: 0.5rem;
+    margin-top: -1.5rem;
+}
+
+.searchBox {
+    width: 64%;
+    padding: 2%;
+    margin: 0% 0 -2% 19%;
+}
+
+.selectBoxOption {
+	border-color: #646266;
+	width: 20%;
+	text-align: center;
+	height:88%;
+}
+
+.detail {
+	margin: 1% 0 0 0;
+}
+
+.recommendationWrap {
+    width: 80%;
+    height: 350px;
+    margin: 5% 0 5% 11%;
+}
+
+.recommendedParty {
+    text-align: center;
+/*     border: 1px solid #646266; */
+    border-radius: 13px;
+    padding: 17px;
+    background: #e8f8f1;
+}
+
+.recommendations {
+	text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    width: 120%;
+    margin: 0 0 0 5%;
+}
+
+.partyIcon_main {
+    width: 28%;
+    height: 25%;
+    display: block;
+    margin: auto;
+}
+.flex_container{
+	text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: 2% 0 0 12%;
+}
+
+.flex_item {
+	float: left;
+    width: 23%;
+    cursor: pointer;
+    text-align: center;
+    margin: 0% 1% 2% 1%;
+    border: 1px solid #646266;
+    border-radius: 10px
+}
+.plusBtn {       
+    width: 50%;
+    margin: 27% 16% 4% 15%;
+    padding: 7%;
+}

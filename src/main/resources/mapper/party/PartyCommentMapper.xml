@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.party.PartyCommentMapper">
+
+	<sql id="partyCommentCols">
+		PC_COMMENT, PC_CREDAT, PC_CRETIM, PC_LMODAT, PC_LMOTIM, PC_ACTIVE,
+		PI_NUM
+	</sql>
+	
+	<!-- 소모임 회원들 소근소근 리스트 -->
+	<select id="getPartyCommentList" resultType="com.yummyclimbing.vo.party.PartyCommentVO">
+		SELECT 
+		<include refid="partyCommentCols"></include>, PC.PC_NUM, PC.UI_NUM, UI_NICKNAME
+		FROM PARTY_COMMENT PC
+		INNER JOIN USER_INFO UI ON PC.UI_NUM = UI.UI_NUM
+		WHERE PC_ACTIVE = 1 AND PI_NUM = #{piNum}
+		ORDER BY PC_NUM DESC
+	</select>
+	
+	<!-- 소모임 회원들 소근소근 댓글달기 -->
+	<insert id="insertPartyComment" parameterType="com.yummyclimbing.vo.party.PartyCommentVO">
+		INSERT INTO PARTY_COMMENT(
+		<include refid="partyCommentCols"></include>, UI_NUM
+		)
+		VALUES(
+		#{pcComment}, DATE_FORMAT(NOW(),'%Y%m%d'), DATE_FORMAT(NOW(),'%r'),
+		DATE_FORMAT(NOW(),'%Y%m%d'), DATE_FORMAT(NOW(),'%r'), 1, #{piNum}, #{uiNum})
+	</insert>
+	
+	
+	<!-- 소근소근 댓글 수정 -->
+	<update id="updatePartyComment" parameterType="com.yummyclimbing.vo.party.PartyCommentVO">
+		UPDATE PARTY_COMMENT
+		SET
+		PC_COMMENT = #{pcComment},
+		PC_LMODAT = DATE_FORMAT(NOW(),'%Y%m%d'),
+		PC_LMOTIM = DATE_FORMAT(NOW(),'%r')
+		WHERE PC_NUM = #{pcNum} AND UI_NUM = #{uiNum}
+	</update>
+	
+	<!-- 소근소근 댓글 삭제 -->
+	<update id="updatePartyCommentInactive">
+		UPDATE PARTY_COMMENT
+		SET PC_ACTIVE = 0
+		WHERE PC_NUM = #{pcNum}
+	</update>
+	
+	<!-- 소모임 탈퇴시 유저가 작성한 모든 소근소근 댓글 삭제 -->
+	<update id="updateAllCommentInactive">
+		UPDATE PARTY_COMMENT
+		SET PC_ACTIVE = 0
+		WHERE PI_NUM = #{piNum} AND UI_NUM = #{uiNum}
+	</update>
+	
+</mapper>

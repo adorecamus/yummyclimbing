@@ -1,0 +1,333 @@
+body {
+    background-color: #ddebd7a8;
+    height: 100%;
+    width: 100%;
+}
+.totalWrap {
+    width: 100%;
+    background-color: #ddebd7a8;
+    height: auto;
+    display: flex;
+    justify-content: center;
+}
+.leftWrap {
+    text-align: center;
+    border-radius: 15px;
+    height: auto;
+/*     padding-top: 7%; */
+}
+
+.partyWidget {
+	border-radius: 15px;
+	background-color: #fff;
+	box-shadow: 4px 4px 4px 2px #dddedde0;
+	padding-top: 15%;
+    padding-bottom: 7%;
+    margin-top: 10%;
+}
+.rightWrap {
+    height: 100%;
+    max-height: max-content;
+}
+
+.partyBox, .noticeWrap, .commentWrap {
+    background-color: white;
+    padding: 36px;
+    border-radius: 15px;
+    margin-top: 90px;
+} 
+.partyName {
+	color: green;
+	font-size: 2.12rem;
+	font-family: LeeSeoyun, sans-serif;
+	font-weight: 600;	
+}
+
+.party-f {
+	font-size: 1.23rem;
+    font-family: Pretendard-Regular;
+    color: #2d3a32;
+}
+
+.partyNameBox {
+	padding: 3%;
+}
+
+.partyNameBox p{
+	font-size : 20px;
+}
+
+.partyIcon_view {
+	width:30%;
+	display: inline-block;
+	margin: auto;
+}
+
+#piMember {
+	cursor: pointer;
+}
+
+#piMember:hover {
+	color: #51B56D;
+}
+
+.userImage {
+	max-width:51px;
+	border-radius: 70%;
+}
+
+#closeLayerBtn {
+	float: right;
+}
+
+.pop-container {
+	float:left;
+	padding: 20px 20px;
+	overflow-x:hidden;
+	
+}
+
+.pop-layer {
+  display: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 50%;
+  height: auto;
+  background-color: #fff;
+  border: 5px solid #51B56D;
+  z-index: 10;
+  border-radius: 15px;
+}
+
+.dim-layer {
+  display: none;
+  position: fixed;
+  _position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+.dim-layer .dimBg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  opacity: .5;
+  filter: alpha(opacity=50);
+}
+
+.dim-layer .pop-layer {
+  display: block;
+}
+
+.likeBox {
+	display: inline-block;
+	margin-top: 5%;
+}
+#likeBtn {
+    width: 70px;
+    height: 50px;
+    position: relative;
+    cursor: pointer;
+    margin: 15px;
+}
+.partyMemberBox {
+	margin-top: 22px;
+	margin-bottom: 22px;
+}
+
+.rightWrap h3, .noticeWrap h2 {
+	margin-bottom: 1rem;	
+}
+.img {
+	vertical-align: middle;
+    border: 0;
+    max-width: 100%;
+    height: auto;
+    margin: 10px;
+    z-index: 6;
+    margin-left: -40px;
+    margin-top: -2px;
+}
+.partyInfos {
+	width: 75%;
+    padding: 25px;
+	margin-top: 2%;
+}
+
+.partyInfos p{
+	font-size: 20px;
+	line-height: 2rem;
+	margin-bottom: 0.5rem;
+}
+
+.commentBox {
+    margin-top: 49px;
+    width: 100%;
+    margin-left: 5px;
+}
+.inputBox {
+    width: 82%;
+    border: 1.5px solid #D6D6D6;
+    border-radius: 5px;
+    margin: 0% 1.5% 2% 0%;
+    padding: 3%;
+}
+
+
+.title {
+	background-color: #bbe3c9e0;
+    border-radius: 10px;
+    width: 20%;
+    text-align: center;
+    padding: 2px;
+    box-shadow: 3px 3px 0px 0px #c1c4c1e0;
+
+}
+.title h3 {
+    color: #040404;
+    font-size: 18px;
+/*     padding: 4px; */
+    margin-top: 18px;
+} 
+
+.textareaNotice {
+    resize: none;
+    max-height: 100px;
+    width: 77%;
+    border: none;
+}
+.textareaComment {
+    resize: none;
+    border: none;
+    margin: -11px;
+    width: 70%;
+ }
+ 	
+.inputBoxContainer-n {
+    width: 100%;
+    margin-left: 1.5%;
+	margin-top: 6%;
+}
+.inputBoxContainer-c {
+	width: 100%;
+    margin-left: 1.5%;
+}
+.noticeList , .commentList{
+	padding-top: 26px;
+    margin-left: 11px;
+    margin-bottom: 0px;
+    width: 90%;
+/*     font-size:1.29rem; */
+}
+.inputBox {
+    width: 75%;
+    border: 1px solid #D6D6D6;
+    border-radius: 10px;
+    margin: 0% 1.5% 2% 0%;
+    padding: 3%;
+}
+
+.fixed {
+	margin-bottom: 0.5rem;
+}
+.paging {
+	clear: both;
+	margin-left: 1%;
+}
+.noticeWrap {
+	margin-top: 30px;
+	margin-bottom: 30px;	
+}
+.noticeBox {
+    margin-top: 49px;
+    width: 100%;
+    margin-left: 18px;
+}
+
+.commentList .fixed {
+	margin-bottom: 0.5rem;
+    margin-top: -1.5rem;
+}
+
+.searchBox {
+    width: 64%;
+    padding: 2%;
+    margin: 0% 0 -2% 19%;
+}
+
+.selectBoxOption {
+	border-color: #646266;
+	width: 20%;
+	text-align: center;
+	height:88%;
+}
+
+.detail {
+	margin: 1% 0 0 0;
+}
+
+.recommendationWrap {
+    width: 80%;
+    height: 350px;
+    margin: 5% 0 5% 11%;
+}
+
+.recommendedParty {
+    text-align: center;
+/*     border: 1px solid #646266; */
+    border-radius: 13px;
+    padding: 17px;
+    background: #e8f8f1;
+    font-family: 'LeeSeoyun', sans-serif;
+}
+
+.recommendations {
+	text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    width: 120%;
+    margin: 0 0 0 5%;
+}
+
+.partyIcon_main {
+    width: 28%;
+    height: 25%;
+    display: block;
+    margin: auto;
+}
+.flex_container{
+	text-align: center;
+    display: flex;
+    flex-wrap: wrap;
+    width: 80%;
+    margin: 2% 0 0 12%;
+}
+
+.flex_item {
+	float: left;
+    width: 23%;
+    cursor: pointer;
+    text-align: center;
+    margin: 0% 1% 2% 1%;
+    border: 1px solid #646266;
+    border-radius: 10px
+}
+.plusBtn {       
+    width: 50%;
+    margin: 27% 16% 4% 15%;
+    padding: 7%;
+}
+.box{
+			width: 100%;
+			padding: 10px;
+			box-sizing: border-box;
+			resize: none;
+			border: none;
+}

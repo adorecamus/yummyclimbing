@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yummyclimbing.mapper.user.UserPageMapper">
+
+	<!-- 가입한 소모임 -->
+	<select id="getMyParty" resultType="com.yummyclimbing.vo.user.UserPageVO">
+		SELECT PI.PI_NUM, PM.PM_NUM, PI.PI_NAME, PM.PM_GRADE
+		FROM USER_INFO UI 
+		INNER JOIN PARTY_MEMBER PM ON UI.UI_NUM = PM.UI_NUM
+		INNER JOIN PARTY_INFO PI ON PM.PI_NUM = PI.PI_NUM
+		WHERE UI.UI_NUM = #{uiNum}
+	</select>
+		
+	<!-- 좋아요 소모임 보기 -->
+	<select id="getLikeParty" resultType="com.yummyclimbing.vo.user.UserPageVO">
+		SELECT PI.PI_NUM, PI.PI_NAME, PL.UI_NUM
+		FROM PARTY_LIKE PL
+		INNER JOIN USER_INFO UI ON PL.UI_NUM = UI.UI_NUM
+		INNER JOIN PARTY_INFO PI ON PL.PI_NUM = PI.PI_NUM
+		WHERE PL.PL_ACTIVE = 1 AND PL.UI_NUM = #{uiNum} 
+	</select>
+
+	<!-- 좋아요 산 보기 -->
+	<select id="getLikeMountain" resultType="com.yummyclimbing.vo.user.UserPageVO">
+		SELECT MI.MNTNM, MUL.UI_NUM, MI.MI_NUM FROM MOUNTAIN_USER_LIKE MUL
+		INNER JOIN MOUNTAIN_INFO MI ON MUL.MI_NUM = MI.MI_NUM
+		INNER JOIN USER_INFO UI ON UI.UI_NUM = MUL.UI_NUM
+		WHERE MUL.MUL_CNT = 1 AND MUL.UI_NUM = #{uiNum}
+	</select>
+	
+	<!--  좋아요 커뮤니티 게시글 보기 -->
+	<select id="getLikeBoard" resultType="com.yummyclimbing.vo.user.UserPageVO">
+		SELECT CBL.CBL_NUM, CBL.UI_NUM, CBL.CB_NUM, CB.CB_CATEGORY, CB.CB_TITLE 
+		FROM COMMUNITY_BOARD_LIKE CBL
+		INNER JOIN COMMUNITY_BOARD CB ON CBL.CB_NUM = CB.CB_NUM
+		WHERE CBL.UI_NUM = #{uiNum}  AND CBL.CBL_CNT = 1
+	</select>
+	<!-- 내가 쓴 글 보기 -->
+	<select id="getMyBoard" resultType="com.yummyclimbing.vo.user.UserPageVO">
+		SELECT UI_NUM, CB_NUM, CB_CATEGORY, CB_TITLE, CB_CREDAT FROM COMMUNITY_BOARD 
+		WHERE UI_NUM=#{uiNum}
+	</select>
+	
+</mapper>

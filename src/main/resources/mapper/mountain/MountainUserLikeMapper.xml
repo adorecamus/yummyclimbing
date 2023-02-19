@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.mountain.MountainUserLikeMapper">
+	<sql id="mountainUserLikeCols">
+		MUL_NUM, MI_NUM, UI_NUM, MUL_CNT
+	</sql>
+
+	<!-- select -->
+	<!-- 활성화된 좋아요 수 가져오기 -->
+	<select id="getMountainUserLikeEnabledCount" resultType="int">
+			SELECT
+				COUNT(*)
+			FROM
+				MOUNTAIN_USER_LIKE
+			<where>
+				<if test='miNum!=null and miNum!=""'>
+					AND MI_NUM = #{miNum}
+				</if>
+				<if test='uiNum!=null and uiNum!=""'>
+					AND UI_NUM = #{uiNum}
+				</if>
+				AND MUL_CNT=1
+		</where>
+	</select>
+	
+	<!-- 테이블에 좋아요 정보가 존재하는지 가져오기 -->
+	<select id="checkMountainUserLikeInfo" resultType="com.yummyclimbing.vo.mountain.MountainUserLikeVO">
+		SELECT
+			<include refid="mountainUserLikeCols" />
+		FROM
+			MOUNTAIN_USER_LIKE
+		<where>
+			AND MI_NUM = #{miNum}
+			AND UI_NUM = #{uiNum}
+		</where>
+	</select>
+	
+	<!-- 테이블에 좋아요를 누른 산 & 유저 정보 가져오기 -->
+<!-- 	<select id="getMountainUserLikeInfo" resultType="com.yummyclimbing.vo.mountain.MountainUserLikeVO">
+		SELECT
+			<include refid="mountainUserLikeCols" />
+		FROM
+			MOUNTAIN_USER_LIKE
+		<where>
+			<if test='miNum!=null and miNum!=""'>
+				AND MI_NUM = #{miNum}
+			</if>
+			<if test='uiNum!=null and uiNum!=""'>
+				AND UI_NUM = #{uiNum}
+			</if>
+		</where>
+	</select> -->
+	
+	<!-- insert -->
+	<!-- 좋아요 정보가 테이블에 존재하지 않을시 정보 생성 -->
+	<insert id="insertMountainUserLike" parameterType="com.yummyclimbing.vo.mountain.MountainUserLikeVO">
+		INSERT INTO	MOUNTAIN_USER_LIKE(
+			MI_NUM, UI_NUM
+		)
+		VALUES(
+			#{miNum}, #{uiNum}
+		)
+	</insert>
+	
+	<!-- update -->
+	<!-- 좋아요 상태 바꾸기 Enable(Default)=1, Disable=-1 -->
+	<update id="toggleMountainUserLike" parameterType="com.yummyclimbing.vo.mountain.MountainUserLikeVO">
+		UPDATE MOUNTAIN_USER_LIKE
+		SET MUL_CNT=MUL_CNT*-1
+		<where>
+			AND MI_NUM = #{miNum}
+			AND UI_NUM = #{uiNum}		
+		</where>
+	</update>
+</mapper>

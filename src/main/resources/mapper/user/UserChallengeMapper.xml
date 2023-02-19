@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yummyclimbing.mapper.user.UserChallengeMapper">
+
+	<sql id="userChallengeCols">
+		UC.UC_NUM, UC.UC_CHALLENGE,
+		UC.UC_CREDAT, UC.UC_LMODAT
+	</sql>
+
+	<!--챌린지 리스트 불러오기 (마이 페이지)-->
+	<select id="selectUserChallengeList"
+		resultType="com.yummyclimbing.vo.user.UserChallengeVO">
+		SELECT
+		<include refid="userChallengeCols" />
+		, UI.UI_NUM
+		FROM USER_CHALLENGE UC
+		INNER JOIN USER_INFO UI ON UC.UI_NUM
+		= UI.UI_NUM
+		WHERE UI.UI_NUM = #{uiNum}
+	</select>
+
+
+
+	<!-- 챌린지 상세보기 (view)-->
+	<select id="selectUserChallenge"
+		resultType="com.yummyclimbing.vo.user.UserChallengeVO">
+		SELECT
+		<include refid="userChallengeCols"></include>
+		, UI.UI_NUM
+		FROM USER_CHALLENGE UC
+		INNER JOIN USER_INFO UI ON UC.UI_NUM
+		= UI.UI_NUM
+		WHERE UC.UC_NUM = #{ucNum}
+	</select>
+
+
+	<!-- 챌린지 추가하기 (마이 페이지)-->
+	<insert id="insertUserChallenge"
+		parameterType="com.yummyclimbing.vo.user.UserChallengeVO">
+		INSERT INTO USER_CHALLENGE(
+		UC_CHALLENGE, UC_CREDAT,
+		UC_LMODAT, UI_NUM)
+		VALUES(#{ucChallenge}, DATE_FORMAT(NOW(),'%Y%m%d'), "", #{uiNum})
+	</insert>
+
+
+	<!-- 챌린지 내용수정 (view)-->
+	<update id="updateUserChallenge"> 
+		UPDATE USER_CHALLENGE
+		SET UC_CHALLENGE = #{ucChallenge},
+		UC_LMODAT = DATE_FORMAT(NOW(),'%Y%m%d')
+		WHERE UC_NUM = #{ucNum}
+	</update>
+
+
+	<!-- 챌린지 완료삭제 (view)-->
+	<delete id="deleteUserChallenge"> 
+		DELETE FROM USER_CHALLENGE 
+		WHERE UC_NUM=#{ucNum}
+	</delete>
+</mapper>

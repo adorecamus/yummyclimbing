@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.party.PartyMemberMapper">
+
+	<!-- 소소모임 정원 확인 -->
+	<select id="selectMemberCount" resultType="com.yummyclimbing.vo.party.PartyMemberVO">
+		SELECT COUNT(PM.UI_NUM) MEM_NUM, PI_MEMBER_CNT
+		FROM PARTY_MEMBER PM
+		INNER JOIN PARTY_INFO PI ON PM.PI_NUM = PI.PI_NUM
+		AND PM.PI_NUM = #{piNum} AND PM_ACTIVE = 1
+	</select>
+
+	<!-- 소소모임 부원 가입 -->
+	<insert id="insertPartyMember">
+		INSERT INTO PARTY_MEMBER(
+		PI_NUM, UI_NUM, PM_GRADE
+		) VALUES(
+		#{piNum}, #{uiNum}, #{pmGrade})
+	</insert>
+	
+	<!-- 탈퇴한 부원 소소모임 재가입 -->
+	<update id="rejoinParty">
+		UPDATE PARTY_MEMBER
+		SET PM_ACTIVE = 1,
+		PM_LMODAT = DATE_FORMAT(NOW(), '%Y%m%d')
+		WHERE UI_NUM = #{uiNum} AND PI_NUM=#{piNum}
+	</update>
+	
+	<!-- 소소모임 부원 탈퇴 -->
+	<update id="quitPartyMember">
+		UPDATE PARTY_MEMBER
+		SET PM_ACTIVE = 0,
+		PM_LMODAT = DATE_FORMAT(NOW(), '%Y%m%d')
+		WHERE UI_NUM = #{uiNum} AND PI_NUM = #{piNum}
+	</update>
+	
+	<!-- 소모임 멤버 정보 -->
+	<select id="selectPartyMemberList"
+		resultType="com.yummyclimbing.vo.user.UserInfoVO">
+		SELECT PM_NUM, UI_IMG_PATH, UI_NICKNAME, UI_AGE, UI_GENDER, PM_GRADE, PM_LMODAT
+		FROM PARTY_MEMBER PM
+		INNER JOIN USER_INFO UI ON UI_ACTIVE = 1 AND PM.UI_NUM = UI.UI_NUM
+		WHERE PM_ACTIVE = 1 AND PM.PI_NUM = #{piNum}
+		GROUP BY PM.UI_NUM
+		ORDER BY PM_LMODAT ASC
+	</select>
+	
+	<!-- 차단한 부원 보기 -->
+	<select id="selectBlockedPartyMemberList"
+		resultType="com.yummyclimbing.vo.user.UserInfoVO">
+		SELECT PM_NUM, UI_IMG_PATH, UI_NICKNAME, PM_LMODAT
+		FROM PARTY_MEMBER PM
+		INNER JOIN USER_INFO UI ON UI_ACTIVE = 1 AND PM.UI_NUM = UI.UI_NUM
+		WHERE PM_ACTIVE = -1 AND PM.PI_NUM = #{piNum}
+		GROUP BY PM.UI_NUM
+		ORDER BY PM_LMODAT ASC
+	</select>
+	
+	<!-- 소모임 부원 탈퇴/차단/차단 해제 -->
+	<update id="updatePartyMemberActive">
+		UPDATE PARTY_MEMBER PM
+		SET PM_ACTIVE = #{pmActive},
+		PM_LMODAT = DATE_FORMAT(NOW(), '%Y%m%d')
+		<where>
+			<if test='pmNums != null and pmNums.size != 0'>
+				<foreach collection="pmNums" item="pmNum" separator="OR">
+					PM_NUM = #{pmNum}
+				</foreach>
+			</if>
+		</where>
+	</update>
+	
+	<!-- 소소모임 권한(대장/부원) 확인 -->
+	<select id="selectMemberAuth" resultType="com.yummyclimbing.vo.party.PartyMemberVO">
+		SELECT PM_GRADE, PM_ACTIVE
+		FROM PARTY_MEMBER
+		WHERE UI_NUM = #{uiNum} AND PI_NUM = #{piNum}
+	</select>
+	
+	<!-- 회원탈퇴시 소속 소소모임 자동탈퇴 -->
+	<update id="deleteLinkedMember">
+		UPDATE PARTY_MEMBER
+		SET PM_ACTIVE = 0
+		WHERE UI_NUM = #{uiNum} AND PM_ACTIVE = 1 
+		AND PI_NUM IN(
+		SELECT PI_NUM
+		FROM PARTY_INFO
+		WHERE PI_ACTIVE = 1
+		)
+	</update>
+	
+	<!-- 회원 기본키로 소속 소소모임 조회 -->
+	<select id="selectPartiesByUiNum" resultType="int">
+		SELECT PI_NUM
+		FROM PARTY_INFO
+		WHERE PI_NUM IN(
+		SELECT PI_NUM
+		FROM PARTY_MEMBER
+		WHERE UI_NUM = #{uiNum} AND PM_ACTIVE = 1) AND PI_ACTIVE = 1
+	</select>
+	
+</mapper>

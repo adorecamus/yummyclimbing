@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.mountain.MountainCommentMapper">
+	<sql id="mountainCommentCols">
+		MC_NUM,	MI_NUM, UI_NUM, MC_COMMENT, MC_ACTIVE,
+		MC_CREDAT, MC_LMODAT, MC_CRETIM, MC_LMOTIM
+	</sql>
+	
+	<!-- select -->
+	<!-- 산 코멘트 리스트 가져오기 -->
+	<select id="selectMountainCommentList" resultType="com.yummyclimbing.vo.mountain.MountainCommentVO">
+		SELECT
+			<include refid="mountainCommentCols" />
+		FROM
+			MOUNTAIN_COMMENT
+		<where>
+			AND MC_ACTIVE=1
+		</where>
+			ORDER BY MC_LMODAT DESC, MC_LMOTIM DESC
+	</select>
+	
+	<!-- 산 별 코멘트 정보들 가져오기 -->
+	<select id="selectMountainCommentListAndUser" resultType="com.yummyclimbing.vo.mountain.MountainCommentVO">
+		SELECT
+			MC.MC_NUM, MC.MI_NUM, MC.UI_NUM, MC.MC_COMMENT, MC.MC_ACTIVE,
+			MC.MC_CREDAT, MC.MC_LMODAT, UI.UI_NICKNAME, UI.UI_IMG_PATH, MC.MC_CRETIM, MC.MC_LMOTIM
+		FROM
+			MOUNTAIN_COMMENT MC
+		INNER JOIN 
+			USER_INFO UI ON UI.UI_ACTIVE = 1 AND MC.MC_ACTIVE=1 AND MC.UI_NUM = UI.UI_NUM
+		<where>
+			MC.MI_NUM = #{miNum}
+		</where>
+			ORDER BY MC.MC_CREDAT ASC, MC.MC_CRETIM ASC
+	</select>
+	
+	<!-- 산 코멘트 개수 가져오기 -->
+	<select id="selectMountainCommentCount" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			MOUNTAIN_COMMENT
+		<where>
+			<if test='miNum!=null and miNum!=""'>
+				AND MI_NUM = #{miNum}
+			</if>
+			<if test='uiNum!=null and uiNum!=""'>
+				AND UI_NUM = #{uiNum}
+			</if>
+			AND MC_ACTIVE=1
+		</where>
+	</select>
+	
+	<!-- 산 코멘트 존재 체크 -->
+	<select id="checkMountainComment" resultType="boolean">
+		SELECT
+			<include refid="mountainCommentCols" />
+		FROM
+			MOUNTAIN_COMMENT
+		<where>
+				AND MC_NUM = #{mcNum}
+				AND UI_NUM = #{uiNum}
+				AND MC_ACTIVE=1
+		</where>
+	</select>	
+	
+	<!-- insert -->
+	<!-- 산 코멘트 입력-->
+	<insert id="insertMountainComment" parameterType="com.yummyclimbing.vo.mountain.MountainCommentVO">
+		INSERT INTO
+			MOUNTAIN_COMMENT(
+				MI_NUM, UI_NUM, MC_COMMENT
+			)
+			VALUES(
+				#{miNum}, #{uiNum}, #{mcComment}
+			)
+	</insert>
+	
+	<!-- update -->
+	<!-- 산 코멘트 수정 -->
+	<update id="updateMountainComment" parameterType="com.yummyclimbing.vo.mountain.MountainCommentVO">
+		UPDATE
+			MOUNTAIN_COMMENT
+		SET
+			MC_COMMENT=#{mcComment},
+			MC_LMODAT=DATE_FORMAT(NOW(),'%Y%m%d'),
+			MC_LMOTIM=DATE_FORMAT(NOW(),'%H%i%S')
+		<where>
+			AND MI_NUM = #{miNum}
+			AND UI_NUM = #{uiNum}
+			AND MC_NUM = #{mcNum}
+		</where>
+	</update>
+	
+	<!-- 산 코멘트 활성화 변경 // enable=1 disable=-1 -->
+	<update id="updateMountainCommentActive" parameterType="com.yummyclimbing.vo.mountain.MountainCommentVO">
+		UPDATE
+			MOUNTAIN_COMMENT
+		SET
+			MC_ACTIVE=MC_ACTIVE*-1,
+			MC_LMODAT=DATE_FORMAT(NOW(),'%Y%m%d'),
+			MC_LMOTIM=DATE_FORMAT(NOW(),'%H%i%S')
+		<where>
+			AND MI_NUM = #{miNum}
+			AND UI_NUM = #{uiNum}
+			AND MC_NUM = #{mcNum}
+		</where>
+	</update>
+</mapper>

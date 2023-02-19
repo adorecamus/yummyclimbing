@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.community.CommunityBoardMapper">
+
+	<sql id="communityboardCols">
+		CB.UI_NUM, CB.CB_NUM, CB.CB_TITLE, CB.CB_CONTENT, 
+		CB.CB_CREDAT, CB.CB_CRETIM, CB.CB_LMODAT, CB.CB_LMOTIM,
+		CB.CB_ACTIVE, CB.CB_VIEW_CNT, CB.CB_CATEGORY
+	</sql>
+	
+	<!-- 게시판 카테고리별 조회 -->
+	<select id="selectCommunityBoardListByCategory" resultType="com.yummyclimbing.vo.community.CommunityBoardVO">
+		SELECT
+			<include refid="communityboardCols"></include>
+			, (SELECT COUNT(CBC_NUM) 
+			   FROM COMMUNITY_BOARD_COMMENT CBC
+			   WHERE CBC_ACTIVE = 1 AND CB.CB_NUM = CBC.CB_NUM
+			   ) COMMENT_CNT,
+			  (SELECT UI_NICKNAME
+			   FROM USER_INFO UI
+			   WHERE UI_ACTIVE = 1 AND CB.UI_NUM = UI.UI_NUM
+			   ) UI_NICKNAME
+		FROM 
+			COMMUNITY_BOARD CB
+		WHERE 
+			CB_CATEGORY=#{cbCategory} AND CB_ACTIVE = 1
+		ORDER BY 
+			CB_NUM DESC
+	</select>
+	
+	<!-- 게시판 목록 조회 -->
+	<select id="selectCommunityBoardList" resultType="com.yummyclimbing.vo.community.CommunityBoardVO">
+		SELECT
+			<include refid="communityboardCols"></include>, 
+			(SELECT UI.UI_NICKNAME 
+			 FROM USER_INFO UI 
+			 WHERE CB.UI_NUM = UI.UI_NUM) AS UI_NICKNAME,
+			(SELECT COUNT(CBC_NUM) 
+			 FROM COMMUNITY_BOARD_COMMENT CBC 
+			 WHERE CBC_ACTIVE = 1 AND CB.CB_NUM = CBC.CB_NUM) AS COMMENT_CNT
+		FROM COMMUNITY_BOARD CB 
+		<where>
+			AND CB.CB_ACTIVE=1
+			<if test='cbTitle != null and cbTitle != ""'>
+				AND CB_TITLE LIKE CONCAT('%',#{cbTitle},'%')
+			</if>
+			<if test='cbContent != null and cbContent != ""'>
+				AND CB_CONTENT LIKE CONCAT('%',#{cbContent},'%')
+			</if>
+			<if test='uiNickname != null and uiNickname != ""'>
+				AND (SELECT UI.UI_NICKNAME FROM USER_INFO UI WHERE CB.UI_NUM = UI.UI_NUM) LIKE CONCAT('%',#{uiNickname},'%')
+			</if>
+		</where>
+		ORDER BY CB_NUM DESC
+	</select>
+	
+	<select id="selectListWithPage" resultType="com.yummyclimbing.vo.community.CommunityBoardVO">
+		SELECT
+			<include refid="communityboardCols"></include>, UI.UI_ID 
+		FROM COMMUNITY_BOARD
+			<![CDATA[
+		WHERE CB_NUM > 0
+			]]>
+		ORDER BY CB_NUM DESC
+		LIMIT #{skip}, #{amount}
+	</select>
+	
+	<select id="getTotalCnt" resultType="int">
+		<![CDATA[
+		SELECT COUNT(CB_NUM) FROM COMMUNITY_BOARD
+		WHERE CB_NUM > 0
+		]]>
+	</select>
+	
+	<!-- 게시글 보기 -->
+	<select id="selectCommunityBoard" resultType="com.yummyclimbing.vo.community.CommunityBoardVO">
+		SELECT
+		<include refid="communityboardCols"></include>
+		,
+		(SELECT COUNT(CBC_NUM)
+		FROM COMMUNITY_BOARD_COMMENT CBC
+		WHERE CBC_ACTIVE = 1 AND CB.CB_NUM = CBC.CB_NUM
+		) COMMENT_CNT,
+		(SELECT UI_NICKNAME
+		FROM USER_INFO UI
+		WHERE UI_ACTIVE = 1 AND CB.UI_NUM = UI.UI_NUM
+		) UI_NICKNAME
+		FROM COMMUNITY_BOARD CB
+		WHERE CB_NUM = #{cbNum} AND CB_ACTIVE = 1
+	</select>
+	
+	<!-- 게시물 총 개수 -->
+	<select id="getTotal" resultType="int">
+		SELECT COUNT(CB_NUM)
+		FROM COMMUNITY_BOARD
+		WHERE CB_ACTIVE = 1
+	</select>
+	
+	<!-- 게시글 삭제 -->
+	<delete id="deleteCommunityBoard">
+		UPDATE COMMUNITY_BOARD
+		SET CB_ACTIVE = 0
+		WHERE CB_NUM=#{cbNum}
+	</delete>
+	
+	<!-- 게시글 수정 -->
+	<update id="updateCommunityBoard"> 
+		UPDATE COMMUNITY_BOARD
+		SET CB_TITLE = #{cbTitle},
+		CB_CONTENT = #{cbContent},
+		CB_LMODAT = DATE_FORMAT(NOW(),'%Y%m%d'),
+		CB_LMOTIM = DATE_FORMAT(NOW(),'%r')
+		WHERE CB_NUM=#{cbNum}
+	</update>
+	
+	<!-- 게시글 조회수 -->
+	<update id="updateViewCnt">
+		UPDATE COMMUNITY_BOARD
+		SET CB_VIEW_CNT = CB_VIEW_CNT + 1
+		WHERE CB_NUM = #{cbNum}
+	</update>
+	
+	<!-- 게시글 등록 -->
+	<insert id="insertCommunityBoard" parameterType="com.yummyclimbing.vo.community.CommunityBoardVO" useGeneratedKeys="true" keyProperty="cbNum">
+		INSERT INTO COMMUNITY_BOARD(
+		CB_TITLE, CB_CONTENT,
+		UI_NUM, CB_CATEGORY)
+		VALUES(
+		#{cbTitle},#{cbContent},
+		#{uiNum}, #{cbCategory}
+		)
+	</insert>
+	 
+</mapper>

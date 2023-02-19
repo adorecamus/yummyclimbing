@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.community.CommunityBoardLikeMapper">
+	<!-- 좋아요 확인 -->
+	<select id="likeChk" resultType="int">
+		SELECT COUNT(*) FROM COMMUNITY_BOARD_LIKE
+		WHERE CB_NUM=#{cbNum} AND UI_NUM=#{uiNum}
+	</select>
+
+	<!-- 좋아요 정보 -->
+	<select id="getLikeInfo" resultType= "com.yummyclimbing.vo.community.CommunityBoardLikeVO">
+		SELECT CBL_NUM FROM COMMUNITY_BOARD_LIKE
+		WHERE CB_NUM=#{cbNum} AND UI_NUM=#{uiNum} AND CBL_CNT = 1
+	</select>
+
+	<!-- 좋아요 등록 -->
+	<insert id="likeUp">
+		INSERT INTO COMMUNITY_BOARD_LIKE(
+		CBL_NUM, CB_NUM, UI_NUM
+		)
+		VALUES(
+		(SELECT * FROM(SELECT MAX(CBL_NUM)+1 FROM COMMUNITY_BOARD_LIKE)NEXT),
+		#{cbNum}, #{uiNum}
+		)
+	</insert>
+
+	<!-- 좋아요 취소 -->
+	<delete id="likeDown">
+		DELETE FROM COMMUNITY_BOARD_LIKE
+		WHERE CB_NUM=#{cbNum} AND UI_NUM=#{uiNum}
+	</delete>
+	
+	<!-- 좋아요를 클릭 시 CBL_CNT을 1로 만들어서 중복방지 -->
+	<update id="updateLikeChk">
+		UPDATE COMMUNITY_BOARD_LIKE
+		SET CBL_CNT = 1
+		WHERE CB_NUM=#{cbNum} AND UI_NUM=#{uiNum}
+	</update>
+	
+	<!-- 좋아요 취소 시 다시 0 -->
+	<update id="updateLikeChkCancel">
+		UPDATE COMMUNITY_BOARD_LIKE
+		SET CBL_CNT = 0
+		WHERE CB_NUM=#{cbNum} AND UI_NUM=#{uiNum}
+	</update>
+	
+	<!-- 좋아요 수 -->
+	<select id="likeCnt" resultType="_int">
+		SELECT COUNT(*) FROM COMMUNITY_BOARD_LIKE
+		WHERE CB_NUM=#{cbNum} AND CBL_CNT=1
+	</select>
+
+</mapper>

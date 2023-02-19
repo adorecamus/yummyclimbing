@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yummyclimbing.mapper.party.PartyLikeMapper">
+
+<!-- 좋아요 정보 확인 -->
+<select id="getLikeInfo" resultType="com.yummyclimbing.vo.party.PartyLikeVO">
+	SELECT PL_NUM, PI_NUM, UI_NUM FROM PARTY_LIKE
+	WHERE PL_ACTIVE = 1 AND PI_NUM = #{piNum} AND UI_NUM=#{uiNum}
+</select>
+
+<!-- 좋아요 개수 -->
+<select id="likeCnt" resultType="int">
+	SELECT COUNT(*) FROM PARTY_LIKE
+	WHERE PI_NUM = #{piNum} AND PL_ACTIVE = 1
+</select>
+
+<!-- 좋아요 등록 -->
+<insert id="likeUp">
+	INSERT INTO PARTY_LIKE(
+	PI_NUM, UI_NUM, PL_ACTIVE
+	)
+	VALUES(
+	#{piNum}, #{uiNum}, 1
+	)
+</insert>
+
+<!-- 좋아요되어있는지 체크 -->
+<select id="likeCheck" resultType="com.yummyclimbing.vo.party.PartyLikeVO">
+	SELECT PL_ACTIVE, PL_NUM, PI_NUM, UI_NUM
+	FROM PARTY_LIKE
+	WHERE PI_NUM = #{piNum} AND UI_NUM = #{uiNum}
+</select>
+
+<!-- 좋아요 상태 바꾸기 PL_ACTIVE 디폴트1-> -1 -->
+<update id="likeDown" >
+	UPDATE PARTY_LIKE
+	SET PL_ACTIVE = PL_ACTIVE * -1
+	WHERE PI_NUM = #{piNum} AND UI_NUM = #{uiNum}
+</update>
+
+
+</mapper>

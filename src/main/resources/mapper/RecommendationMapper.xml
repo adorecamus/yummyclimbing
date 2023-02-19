@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.yummyclimbing.mapper.RecommendationMapper">
+
+	<insert id="insertRecommendedMountainAndParty">
+		INSERT INTO RANDOM_RECOMMENDATION
+		(MI_NUM, PI_NUM)
+		VALUES
+		<choose>
+			<when test='piNum != 0'>
+				(#{miNum}, #{piNum})
+			</when>
+			<otherwise>
+				(#{miNum}, null)
+			</otherwise>
+		</choose>
+	</insert>
+	
+	<select id="selectMiNumForDuplicateVerification" resultType="int">
+		SELECT MI_NUM
+		FROM RANDOM_RECOMMENDATION
+		WHERE RR_CREDAT = DATE_FORMAT(NOW(),'%Y%m%d')
+		AND MI_NUM = #{miNum}
+		<choose>
+			<when test='piNum != 0'>
+				AND PI_NUM = #{piNum}
+			</when>
+			<otherwise>
+				AND PI_NUM IS NULL
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="selectRecommendedMiNumList" resultType="int">
+		SELECT DISTINCT MI_NUM
+		FROM RANDOM_RECOMMENDATION
+		WHERE RR_CREDAT = DATE_FORMAT(NOW()- INTERVAL 1 DAY,'%Y%m%d')
+	</select>
+	
+	<select id="selectCredat" resultType="string">
+		SELECT RR_CREDAT
+		FROM RANDOM_RECOMMENDATION
+		WHERE RR_CREDAT = DATE_FORMAT(NOW(),'%Y%m%d')
+	</select>
+
+</mapper>
